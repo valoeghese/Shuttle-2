@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "shuttle",
+  "version": "1.0.0",
+  
+  "name": "Shuttle 2",
+  "description": "Mod Description.",
+  "authors": [
+    "Valoeghese"
+  ],
+  
+  "icon": "assets/shuttle/icon.png",
+  "license": "No Licence.",
+  
+  "environment": "*",
+  
+  "entrypoints": {
+    "main": [
+      "valoeghese.shuttle.Shuttle"
+    ]
+  },
+  
+  "requires": {
+    "fabricloader": ">=0.4.0"
+  },
+  
+  "mixins": [
+    "shuttle.mixins.json"
+  ]
+}

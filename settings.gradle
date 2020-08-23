@@ -1,0 +1,21 @@
+pluginManagement {
+    repositories {
+	    maven {
+            name = 'Jitpack'
+            url = 'https://jitpack.io'
+        }
+        jcenter()
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
+        gradlePluginPortal()
+    }
+	resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == "fabric-loom" && requested.version?.endsWith("-SNAPSHOT") != true) {
+                useModule("com.github.ramidzkh:fabric-loom:${requested.version}")
+            }
+        }
+    }
+}
