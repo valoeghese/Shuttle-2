@@ -1,9 +1,7 @@
-package valoeghese.shuttle-2;
+package valoeghese.shuttle;
 
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-
-import java.util.Random;
+import org.apache.logging.log4j.Logger;
 
 import net.fabricmc.api.ModInitializer;
 
@@ -12,6 +10,5 @@ public class Shuttle implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		// Add init code here!
 	}
 }

@@ -3,6 +3,7 @@
   "package": "valoeghese.shuttle.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "MixinItem"
   ],
   "client": [
   ],

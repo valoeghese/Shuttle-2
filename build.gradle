@@ -1,5 +1,5 @@
 plugins {
-	id "fabric-loom" version "0.4-SNAPSHOT"
+	id "fabric-loom" version "5e456aca18"
 	id "maven-publish"
 	id "com.jfrog.artifactory" version "4.15.2"
 }
@@ -36,8 +36,8 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	modImplementation "com.github.fabric-community:TooManyEvents:$(project.events_version}"
-	include "com.github.fabric-community:TooManyEvents:$(project.events_version}"
+	modImplementation "com.github.fabric-community:TooManyEvents:${project.events_version}"
+	include "com.github.fabric-community:TooManyEvents:${project.events_version}"
 
 	compileOnly "com.google.code.findbugs:jsr305:3.0.2"
 }
