@@ -1,3 +1,8 @@
+import org.gradle.api.internal.artifacts.DefaultModuleIdentifier
+import org.gradle.api.internal.artifacts.dependencies.DefaultSelfResolvingDependency
+import org.gradle.api.internal.file.FileCollectionInternal
+import org.gradle.internal.component.external.model.DefaultModuleComponentIdentifier
+
 plugins {
 	id "fabric-loom" version "5e456aca18"
 	id "maven-publish"
@@ -31,7 +36,15 @@ repositories {
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 
-    mappings minecraft.mojmap('1.16.2')
+    //mappings minecraft.mojmap('1.16.2')
+
+	def id = new DefaultModuleComponentIdentifier(DefaultModuleIdentifier.newId("valoeghese", "shuttle-mojmap"), "1.16.2")
+
+    mappings(new DefaultSelfResolvingDependency(id, project.files("./mappings.jar") as FileCollectionInternal) {
+        public String getGroup() { return "valoeghese"; }
+        public String getName() { return "shuttle-mojmap"; }
+        public String getVersion() { return "1.16.2"; }
+    })
 
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
