@@ -1,8 +1,6 @@
 package valoeghese.shuttle.impl;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -11,8 +9,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import javax.annotation.Nullable;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -22,14 +22,29 @@ import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 
 // Adapted from Epic Valo Mod's ScriptManager
-public abstract class ScriptManager {
+public final class ScriptManager {
 	private static final ScriptEngineManager ENGINE_MANAGER = new ScriptEngineManager();
 	private static final Supplier<ScriptEngine> ENGINE_SOURCE = () -> ENGINE_MANAGER.getEngineByName("nashorn");
-	protected final String source;
+	private ScriptContext context;
 
-	public ScriptManager(ZipFile file, String entry) throws IOException {
-		InputStream is = file.getInputStream(file.getEntry(entry));
+	public ScriptManager(ScriptContext context) {
+		this.context = context;
+	}
 
+	@Nullable
+	public Invocable apply(ZipFile file, String entry) throws IOException, ScriptException {
+		ZipEntry fEntry = file.getEntry(entry);
+
+		if (fEntry == null) {
+			return null;
+		}
+
+		try (InputStream is = file.getInputStream(fEntry)) {
+			return this.apply(is);
+		}
+	}
+
+	public Invocable apply(InputStream is) throws IOException, ScriptException {
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
 		int nBytesRead;
@@ -39,12 +54,11 @@ public abstract class ScriptManager {
 			buffer.write(bufferBuffer, 0, nBytesRead);
 		}
 
-		is.close();
-		this.source = new String(buffer.toByteArray(), StandardCharsets.UTF_8);
+		return this.context.runScript(new String(buffer.toByteArray(), StandardCharsets.UTF_8));
 	}
 
 	public static class ScriptContext {
-		protected ScriptContext() {
+		public ScriptContext() {
 		}
 
 		final Set<String> definitions = new HashSet<>();
@@ -79,7 +93,7 @@ public abstract class ScriptManager {
 			this.objectDefinitions.put(def, object);
 		}
 
-		public Invocable runScript(File file) throws ScriptException, IOException {
+		public Invocable runScript(String source) throws ScriptException, IOException {
 			ScriptEngine engine = ENGINE_SOURCE.get();
 			// add objects
 			engine.getBindings(javax.script.ScriptContext.ENGINE_SCOPE).putAll(this.objectDefinitions);
@@ -110,9 +124,7 @@ public abstract class ScriptManager {
 			}
 
 			// eval
-			try (FileReader reader = new FileReader(file)) {
-				engine.eval(reader);
-			}
+			engine.eval(source);
 
 			return (Invocable) engine;
 		}
