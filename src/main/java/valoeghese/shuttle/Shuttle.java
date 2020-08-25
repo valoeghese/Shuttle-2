@@ -6,6 +6,8 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.zip.ZipFile;
 
 import javax.annotation.Nullable;
@@ -17,12 +19,18 @@ import org.apache.logging.log4j.Logger;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.world.item.Item;
+import valoeghese.shuttle.api.event.EventResult;
+import valoeghese.shuttle.api.event.ShuttleSetupEvent;
+import valoeghese.shuttle.impl.Event;
 import valoeghese.shuttle.impl.ScriptManager;
 import valoeghese.shuttle.impl.ScriptManager.ScriptContext;
 
 public class Shuttle implements ModInitializer {
 	@Override
 	public void onInitialize() {
+		AtomicReference<Function<ShuttleSetupEvent, EventResult>> setup = new AtomicReference<>();
+		Event.register("setup", ShuttleSetupEvent.class, false, func -> setup.set(func));
+
 		try {
 			ScriptContext context = new ScriptContext();
 			context.addClassDefinition("Item", Item.class);
