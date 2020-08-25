@@ -14,7 +14,7 @@ pluginManagement {
 	resolutionStrategy {
         eachPlugin {
             if (requested.id.id == "fabric-loom") {
-                useModule("com.github.ramidzkh:fabric-loom:${requested.version}")
+                useModule("com.github.valoeghese:shuttle-loom-temp:${requested.version}")
             }
         }
     }
