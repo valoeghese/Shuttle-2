@@ -23,6 +23,7 @@ import net.minecraft.world.item.Item;
 import valoeghese.shuttle.api.event.EventResult;
 import valoeghese.shuttle.api.event.ShuttleSetupEvent;
 import valoeghese.shuttle.impl.Event;
+import valoeghese.shuttle.impl.JSConsole;
 import valoeghese.shuttle.impl.ScriptManager;
 import valoeghese.shuttle.impl.ScriptManager.ScriptContext;
 
@@ -35,6 +36,10 @@ public class Shuttle implements ModInitializer {
 
 		try {
 			ScriptContext context = new ScriptContext();
+
+			JSConsole console = new JSConsole();
+			context.addObjectDefinition("console", console);
+
 			context.addClassDefinition("Item", Item.class);
 			ScriptManager script = new ScriptManager(context);
 
@@ -57,23 +62,27 @@ public class Shuttle implements ModInitializer {
 
 			// Dev
 			if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
-				Path binFolder = Paths.get("./bin/test");
+				System.out.println("Fabric development environment detected. Searching for Shuttle Dev Test plugin.");
+
+				Path binFolder = Paths.get("../bin/test");
 
 				// If no bin folder might be out :: @reason Intellij uses out/ directory by default.
 				if (!Files.isDirectory(binFolder, LinkOption.NOFOLLOW_LINKS)) {
-					binFolder = Paths.get("./out/test");
+					binFolder = Paths.get("../out/test");
 				}
 
 				// try other folders lol
 				if (!Files.isDirectory(binFolder, LinkOption.NOFOLLOW_LINKS)) {
-					binFolder = Paths.get("./bin");
+					binFolder = Paths.get("../bin");
 				}
 
 				if (!Files.isDirectory(binFolder, LinkOption.NOFOLLOW_LINKS)) {
-					binFolder = Paths.get("./out");
+					binFolder = Paths.get("../out");
 				}
 
 				if (Files.isDirectory(binFolder, LinkOption.NOFOLLOW_LINKS)) {
+					System.out.println("Succesfully found Shuttle Dev Test plugin.");
+
 					try (InputStream stream = Files.newInputStream(binFolder.resolve("main.js"))) {
 						Invocable ivc = script.apply(stream);
 						Event.trySubscribeAll(ivc);
