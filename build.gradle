@@ -38,7 +38,7 @@ repositories {
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 
-    mappings minecraft.shuttleMojangMappings('1.16.2')
+    mappings minecraft.shuttleMojangMappings()
 
 	/*def id = new DefaultModuleComponentIdentifier(DefaultModuleIdentifier.newId("valoeghese", "shuttle-mojmap"), "1.16.2")
 
