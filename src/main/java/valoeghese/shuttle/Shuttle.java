@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -28,6 +29,7 @@ import valoeghese.shuttle.impl.ScriptManager.ScriptContext;
 public class Shuttle implements ModInitializer {
 	@Override
 	public void onInitialize() {
+		System.out.println("Loading Shuttle Plugins.");
 		AtomicReference<Function<ShuttleSetupEvent, EventResult>> setup = new AtomicReference<>();
 		Event.register("setup", ShuttleSetupEvent.class, false, func -> setup.set(func));
 
@@ -41,17 +43,50 @@ public class Shuttle implements ModInitializer {
 					@Nullable Invocable ivc = script.apply(new ZipFile(p.toFile()), "main.js");
 
 					if (ivc != null) {
+						Event.trySubscribeAll(ivc);
 						PLUGINS.add(ivc);
 					}
 				} else if (Files.isDirectory(p, LinkOption.NOFOLLOW_LINKS) && p.getFileName().toString().equals("shuttledev")) {
 					try (InputStream stream = Files.newInputStream(p.resolve("main.js"))) {
-						PLUGINS.add(script.apply(stream));
+						Invocable ivc = script.apply(stream);
+						Event.trySubscribeAll(ivc);
+						PLUGINS.add(ivc);
+					}
+				}
+			}
+
+			// Dev
+			if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
+				Path binFolder = Paths.get("./bin/test");
+
+				// If no bin folder might be out :: @reason Intellij uses out/ directory by default.
+				if (!Files.isDirectory(binFolder, LinkOption.NOFOLLOW_LINKS)) {
+					binFolder = Paths.get("./out/test");
+				}
+
+				// try other folders lol
+				if (!Files.isDirectory(binFolder, LinkOption.NOFOLLOW_LINKS)) {
+					binFolder = Paths.get("./bin");
+				}
+
+				if (!Files.isDirectory(binFolder, LinkOption.NOFOLLOW_LINKS)) {
+					binFolder = Paths.get("./out");
+				}
+
+				if (Files.isDirectory(binFolder, LinkOption.NOFOLLOW_LINKS)) {
+					try (InputStream stream = Files.newInputStream(binFolder.resolve("main.js"))) {
+						Invocable ivc = script.apply(stream);
+						Event.trySubscribeAll(ivc);
+						PLUGINS.add(ivc);
 					}
 				}
 			}
 		} catch (Throwable t) {
 			throw new RuntimeException(t);
 		}
+
+		System.out.println("Setting up Shuttle Plugins.");
+		setup.get().apply(new ShuttleSetupEvent());
 	}
 
 	public static final Logger LOGGER = LogManager.getLogger("Shuttle 2");
