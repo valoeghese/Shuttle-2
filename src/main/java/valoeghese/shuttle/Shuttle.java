@@ -17,10 +17,12 @@ import javax.script.Invocable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import io.github.fabriccommunity.events.world.EntitySpawnCallback;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.world.item.Item;
 import valoeghese.shuttle.api.event.EventResult;
+import valoeghese.shuttle.api.event.ShuttleEntitySpawnEvent;
 import valoeghese.shuttle.api.event.ShuttleSetupEvent;
 import valoeghese.shuttle.impl.Event;
 import valoeghese.shuttle.impl.JSConsole;
@@ -32,7 +34,10 @@ public class Shuttle implements ModInitializer {
 	public void onInitialize() {
 		System.out.println("Loading Shuttle Plugins.");
 		AtomicReference<Function<ShuttleSetupEvent, EventResult>> setup = new AtomicReference<>();
+		// ~~~GAME LIFECYCLE~~~
 		Event.register("setup", ShuttleSetupEvent.class, false, func -> setup.set(func));
+		// ~~~ENTTIY~~~
+		Event.register("entitySpawning", ShuttleEntitySpawnEvent.class, false, func -> EntitySpawnCallback.PRE.register((original, entity, world, reason) -> func.apply(new ShuttleEntitySpawnEvent(original, entity, world, reason)).toInteractionResult()));
 
 		try {
 			ScriptContext context = new ScriptContext();

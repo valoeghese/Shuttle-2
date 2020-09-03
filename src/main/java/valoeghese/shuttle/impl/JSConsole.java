@@ -6,6 +6,9 @@ import org.apache.logging.log4j.Logger;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 
+/**
+ * @author Valoeghese
+ */
 public final class JSConsole {
 	private static final Logger LOGGER = LogManager.getLogger("Plugin");
 	private static final Object2IntMap<String> COUNT = new Object2IntArrayMap<>();
